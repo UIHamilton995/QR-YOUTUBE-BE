@@ -1,4 +1,3 @@
-// src/app.controller.ts
 import { Controller, Get, Param, Res } from '@nestjs/common';
 import { Response } from 'express';
 import * as QRCode from 'qrcode';
@@ -12,17 +11,17 @@ export class AppController {
 
   constructor(private readonly moviesService: MoviesService) {
     console.log('Initializing AppController...');
-    this.updateQRCode(); // Initialize the QR code and movies list
+    this.updateQRCode()http://localhost:3000/qr-code;
     setInterval(() => {
       console.log('Regenerating QR code...');
       this.updateQRCode();
-    }, 20000); // Regenerate every 10 seconds
+    }, 15000);
   }
 
   private async updateQRCode() {
     await this.moviesService.fetchMovies();
-    this.currentLinkId = uuidv4(); // Generate a unique ID
-    this.moviesList = this.moviesService.getRandomMovies(10); // Get 10 random movies
+    this.currentLinkId = uuidv4();
+    this.moviesList = this.moviesService.getRandomMovies(10);
     console.log('Generated Link ID:', this.currentLinkId);
     console.log('Updated Movies List:', this.moviesList);
   }
@@ -35,11 +34,11 @@ export class AppController {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       const qrCodeImage = await QRCode.toBuffer(qrData, {
-        errorCorrectionLevel: 'H', // High error correction level for better reliability
+        errorCorrectionLevel: 'H',
       });
       console.log('QR Code Successfully Encoded');
       res.set('Content-Type', 'image/png');
-      res.send(qrCodeImage); // Send the QR code image
+      res.send(qrCodeImage);
     } catch (error) {
       console.error('Error Generating QR Code:', error);
       res.status(500).send('Failed to generate QR code');
@@ -52,7 +51,6 @@ export class AppController {
     console.log('Current Link ID:', this.currentLinkId);
 
     if (id === this.currentLinkId && this.moviesList.length > 0) {
-      // Stylishly display the movies
       const moviesHtml = this.moviesList
         .map((movie) => `
           <div style="border: 1px solid #ccc; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
