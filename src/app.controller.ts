@@ -15,7 +15,7 @@ export class AppController {
     setInterval(() => {
       console.log('Regenerating QR code...');
       void this.updateQRCode('http://localhost:3000/qr-code');
-    }, 25000);
+    }, 15000);
   }
 
   private async updateQRCode(url: string) {
