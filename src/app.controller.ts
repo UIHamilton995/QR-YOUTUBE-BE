@@ -11,24 +11,24 @@ export class AppController {
 
   constructor(private readonly moviesService: MoviesService) {
     console.log('Initializing AppController...');
-    this.updateQRCode()http://localhost:3000/qr-code;
+    void this.updateQRCode('http://localhost:3000/qr-code');
     setInterval(() => {
       console.log('Regenerating QR code...');
-      this.updateQRCode();
-    }, 15000);
+      void this.updateQRCode('http://localhost:3000/qr-code');
+    }, 25000);
   }
 
-  private async updateQRCode() {
+  private async updateQRCode(url: string) {
     await this.moviesService.fetchMovies();
     this.currentLinkId = uuidv4();
     this.moviesList = this.moviesService.getRandomMovies(10);
-    console.log('Generated Link ID:', this.currentLinkId);
+    console.log(`Running on ${url},Generated Link ID:/${this.currentLinkId}`);
     console.log('Updated Movies List:', this.moviesList);
   }
 
   @Get('qr-code')
   async getQRCode(@Res() res: Response) {
-    const qrData = `http://localhost:3000/movies/${this.currentLinkId}`; // Construct the QR code data
+    const qrData = `http://localhost:3000/movies/${this.currentLinkId}`;
     console.log('QR Code Data:', qrData);
 
     try {
