@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { Movie } from './movies.interface';
 
 @Injectable()
 export class MoviesService {
-  private movies: any[] = [];
+  private movies: Movie[] = [];
 
-  async fetchMovies() {
+  async fetchMovies(): Promise<void> {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       const response = await axios.get(
@@ -19,7 +20,7 @@ export class MoviesService {
     }
   }
 
-  getRandomMovies(count: number): any[] {
+  getRandomMovies(count: number): Movie[] {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const shuffled = [...this.movies].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);

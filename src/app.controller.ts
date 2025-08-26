@@ -3,32 +3,40 @@ import { Response } from 'express';
 import * as QRCode from 'qrcode';
 import { v4 as uuidv4 } from 'uuid';
 import { MoviesService } from './movies/movies.service';
+import { Movie } from './movies/movies.interface';
 
 @Controller()
 export class AppController {
   private currentLinkId: string;
-  private moviesList: any[] = [];
+  private moviesList: Movie[] = [];
+  private readonly baseUrl: string;
 
   constructor(private readonly moviesService: MoviesService) {
+    this.baseUrl =
+      process.env.NODE_ENV === 'production'
+        ? 'https://your-ec2-public-url.com'
+        : 'http://localhost:3000';
+
     console.log('Initializing AppController...');
-    void this.updateQRCode('http://localhost:3000/qr-code');
+    void this.updateQRCode();
     setInterval(() => {
       console.log('Regenerating QR code...');
-      void this.updateQRCode('http://localhost:3000/qr-code');
+      void this.updateQRCode();
     }, 15000);
   }
 
-  private async updateQRCode(url: string) {
+  private async updateQRCode() {
     await this.moviesService.fetchMovies();
     this.currentLinkId = uuidv4();
     this.moviesList = this.moviesService.getRandomMovies(10);
-    console.log(`Running on ${url},Generated Link ID:/${this.currentLinkId}`);
-    console.log('Updated Movies List:', this.moviesList);
+    console.log(
+      `Running on ${this.baseUrl}, Generated Link ID: ${this.currentLinkId}`,
+    );
   }
 
   @Get('qr-code')
   async getQRCode(@Res() res: Response) {
-    const qrData = `http://localhost:3000/movies/${this.currentLinkId}`;
+    const qrData = `${this.baseUrl}/movies/${this.currentLinkId}`;
     console.log('QR Code Data:', qrData);
 
     try {
@@ -52,7 +60,8 @@ export class AppController {
 
     if (id === this.currentLinkId && this.moviesList.length > 0) {
       const moviesHtml = this.moviesList
-        .map((movie) => `
+        .map(
+          (movie) => `
           <div style="border: 1px solid #ccc; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
             <h2 style="margin: 0 0 10px;">${movie.Title} (${movie.Year})</h2>
             <div style="display: flex; gap: 20px;">
@@ -75,12 +84,11 @@ export class AppController {
               <h3>Additional Images</h3>
               <div style="display: flex; gap: 10px; overflow-x: auto;">
                 ${
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                   movie.Images
                     ? movie.Images.map(
-                      (image) =>
-                        `<img src="${image}" alt="Movie Image" style="width: 150px; height: auto; border-radius: 8px;" />`
-                    ).join('')
+                        (image) =>
+                          `<img src="${image}" alt="Movie Image" style="width: 150px; height: auto; border-radius: 8px;" />`,
+                      ).join('')
                     : '<p>No additional images available.</p>'
                 }
               </div>
@@ -96,7 +104,7 @@ export class AppController {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>York NestJS Random Movies App</title>
+          <title>Hamilton NestJS Random Movies App</title>
           <style>
             body {
               font-family: Arial, sans-serif;
@@ -110,7 +118,7 @@ export class AppController {
           </style>
         </head>
         <body>
-          <h1>York NestJS Random Movies App</h1>
+          <h1>Hamilton NestJS Random Movies App</h1>
           ${moviesHtml}
         </body>
         </html>
