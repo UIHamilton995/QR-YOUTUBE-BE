@@ -13,9 +13,9 @@ export class AppController {
 
   constructor(private readonly moviesService: MoviesService) {
     this.baseUrl =
-      process.env.NODE_ENV === 'production'
-        ? 'https://your-ec2-public-url.com'
-        : 'http://localhost:3000';
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : '18.212.6.185';
 
     console.log('Initializing AppController...');
     void this.updateQRCode();
